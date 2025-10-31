@@ -1,0 +1,48 @@
+Building Psi4 1.10 with PCM-Solver on Compute Canada
+
+
+Environment Summary
+| Component | Version       | Module          |
+| --------- | ------------- | --------------- |
+| Compiler  | GCC 12.3      | `gcc/12.3`      |
+| MPI       | OpenMPI 4.1.5 | `openmpi/4.1.5` |
+| CMake     | ≥ 3.27        | `cmake/3.27.7`  |
+| Eigen     | 3.4.0         | `eigen/3.4.0`   |
+| HDF5      | 1.14.2        | `hdf5/1.14.2`   |
+| Python    | 3.12          | `python/3.12`   |
+| Numpy     | 1.2.1         |                 |   
+
+
+module purge
+module load StdEnv/2023 gcc/12.3 openmpi/4.1.5 cmake/3.27.7 \
+             hdf5/1.14.2 eigen/3.4.0 python/3.10
+
+
+tar -xf psi4-1.10.tar.gz    # or: git clone https://github.com/psi4/psi4.git
+cd psi4-1.10
+mkdir -p objdir && cd objdir
+
+
+##Check the Eigen Include Layout 
+if you install in one cluster check the eigene3/Eigen/Core path
+psi4 expects the location of core at .../include/eigen3/Eigen/Core
+****check your own working station or PC where the CORE location is, like: $EBROOTEIGEN/include/Eigen/Core
+If not the psi4 default path for eigene3/Eigen/Core, then:
+
+-----------------# Create a local header shadow -----------------------
+mkdir -p ~/local/include/eigen3
+ln -s $EBROOTEIGEN/include/Eigen ~/local/include/eigen3/Eigen
+export CPLUS_INCLUDE_PATH=$HOME/local/include:$CPLUS_INCLUDE_PATH
+
+cd ~/psi4-1.10/objdir
+cmake .. \
+  -DENABLE_PCMSolver=ON \
+  -DENABLE_openmp=ON \
+  -DHDF5_ROOT=$EBROOTHDF5 \
+  -DEigen3_DIR=$EBROOTEIGEN/share/eigen3/cmake \
+  -DCMAKE_INCLUDE_PATH=$HOME/local/include \
+  -DCMAKE_INSTALL_PREFIX=$HOME/psi4 \
+  -DCMAKE_BUILD_TYPE=Release
+
+make -j12
+make install 
