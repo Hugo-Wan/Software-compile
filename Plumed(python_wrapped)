@@ -1,0 +1,23 @@
+##install python-wrapped plumed 
+
+#------------------If the cluster not support conda environment, the create and use the virtual env
+
+1. virtualenv --no-download ENV
+2. source ENV/bin/activate
+cd /path/to/plumed/source
+./configure PYTHON_BIN=/path/to/ENV/bin/python3.12 --prefix=$HOME/plumed --enable-modules=all
+make -j12
+make install
+
+
+###---------------Then add the following content in ~/.bashrc
+
+export PATH="$HOME/plumed/bin:$PATH"
+export LD_LIBRARY_PATH="$HOME/plumed/lib:$LD_LIBRARY_PATH"
+export PYTHONPATH="$HOME/plumed/lib/plumed/python:$PYTHONPATH"
+
+
+##----------------Check whether installation in the correct position and properly
+/path/to/ENV/bin/python3.12
+import plumed
+print(plumed.__file__)
