@@ -1,0 +1,69 @@
+#Install NAMD patched with update COLVARS module
+
+##namd-main.zip from NAMD Gitlab; Latest COLVARS; Charm-8.0.0.tar.gz; openmm-master.zip NAMDlib.zip
+
+##------1. CPU-single-node-multicores
+#use Lepton in openMM library
+export OPENMM_SOURCE=/path/to/openmm-master
+sh ./colvars-xxx/update-colvars-code.sh ./namd-main
+mv NAMDlib.zip namd-main
+mv Charm-8.0.0.tar.gz namd-main
+cd namd-main
+unzip NAMDlib.zip
+
+###---------Charm-build-step
+./buildold ###using the traditional way to build NAMD
+Are you building to run just on the local machine, and not across multiple nodes? [y/N]: Y
+Do you want to specify a compiler? [y/N]: N   ###-----------automatically select the compile in your computer
+Do you want to specify any Charm++ build options, such as Fortran compilers? [y/N]: N
+
+Choose a set of compiler flags [1-5]  ----- [3]
+	1) none
+	2) debug mode                        -g -O0
+	3) production build [default]        --with-production
+	4) production build w/ projections   --with-production --enable-tracing
+	5) custom
+
+What do you want to build?  ----- [1]
+	1) Charm++ [default] (choose this if you are building NAMD)
+	2) Charm++ and AMPI
+	3) Charm++, AMPI, ParFUM and other libraries
+
+Do you want to compile in parallel?  ----- [5]
+        1) No
+        2) Build with -j2
+        3) Build with -j4
+        4) Build with -j8
+        5) Build with -j16 [default]
+        6) Build with -j32
+        7) Build with -j
+Do you want to start the build now? [Y/n]: Y
+
+###or directly use the following command
+./build charm++ multicore-linux-x86_64   -j16  --with-production
+###---------Charm-build-step
+
+
+###-----namd-build-step
+cd ..  ###to namd-main folder
+./config Linux-x86_64-g++
+cd Linux-x86_64-g++/
+
+vi Make.config
+CHARMBASE = .rootdir/charm-8.0.0
+include .rootdir/arch/Linux-x86_64-g++.arch
+CHARM = /path/to/charm-8.0.0
+NAMD_PLATFORM = $(NAMD_ARCH)-multicore
+include .rootdir/arch/$(NAMD_ARCH).base
+include .rootdir/arch/$(NAMD_ARCH).tcl
+include .rootdir/arch/$(NAMD_ARCH).fftw
+TCLDIR = /path/to/tcl
+FFTDIR = /path/to/fftw
+
+###--------for Ubuntu user
+vi ../arch/Linux-x86_64-g++.arch  
+CXXOPTS= -O3 -fexpensive-optimizations --fast-math -no-pie  ##adding -no-pie in the line
+###--------for Ubuntu user
+
+make depends
+make -j16
