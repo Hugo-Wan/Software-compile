@@ -7,11 +7,12 @@
 export OPENMM_SOURCE=/path/to/openmm-master
 sh ./colvars-xxx/update-colvars-code.sh ./namd-main
 mv NAMDlib.zip namd-main
-mv Charm-8.0.0.tar.gz namd-main
+mv charm-8.0.0.tar.gz namd-main
 cd namd-main
 unzip NAMDlib.zip
 
 ###---------Charm-build-step
+cd charm-8.0.0
 ./buildold ###using the traditional way to build NAMD
 Are you building to run just on the local machine, and not across multiple nodes? [y/N]: Y
 Do you want to specify a compiler? [y/N]: N   ###-----------automatically select the compile in your computer
