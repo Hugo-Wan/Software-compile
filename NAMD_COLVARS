@@ -47,7 +47,13 @@ Do you want to start the build now? [Y/n]: Y
 
 ###-----namd-build-step
 cd ..  ###to namd-main folder
-./config Linux-x86_64-g++
+
+********##without cuda
+./config Linux-x86_64-g++ 
+
+********####with cuda
+./config Linux-x86_64-g++ --with-cuda --with-single-node-cuda --cuda-prefix /usr/local/cuda 
+
 cd Linux-x86_64-g++/
 
 vi Make.config
